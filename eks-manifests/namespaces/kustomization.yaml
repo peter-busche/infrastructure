@@ -1,0 +1,8 @@
+# Kustomization for cluster namespaces.
+# Kustomize is a template-free way to customize Kubernetes manifests.
+# This file declares which namespace manifests to include when applying this directory.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ns-apps.yaml

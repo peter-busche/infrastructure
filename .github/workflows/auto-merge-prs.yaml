@@ -1,0 +1,30 @@
+name: Auto Merge Manifest PRs
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'gitops/**'
+
+jobs:
+  auto-merge:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Auto merge PR from peter-busche
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_CICD_PAT }}
+          AUTHORIZED_USER: peter-busche
+        run: |
+          PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
+          PR_AUTHOR=$(jq --raw-output .pull_request.user.login "$GITHUB_EVENT_PATH")
+
+          if [ "$PR_AUTHOR" = "$AUTHORIZED_USER" ]; then
+            echo "Auto-merging PR #$PR_NUMBER from $PR_AUTHOR"
+            gh pr merge "$PR_NUMBER" --squash --admin
+          else
+            echo "PR #$PR_NUMBER from $PR_AUTHOR is not $AUTHORIZED_USER, skipping."
+          fi

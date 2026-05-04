@@ -1,0 +1,10 @@
+# Create a Kubernetes namespace for application workloads.
+# Namespaces provide logical isolation and make it easier to manage RBAC,
+# network policies, and resource quotas per team or project.
+#
+# Applications deployed in this cluster should target the 'apps' namespace
+# instead of the default namespace.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: apps

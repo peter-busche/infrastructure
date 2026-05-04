@@ -1,0 +1,23 @@
+# ArgoCD Application for the rag_api manifests
+# This Application syncs Kubernetes manifests from gitops/rag_api/base to the EKS cluster
+
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: rag-api
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/${GITHUB_USERNAME}/project1_infrastructure.git
+    targetRevision: main
+    path: gitops/rag_api/base
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: apps  # Deploy to the "apps" namespace created by the namespaces ArgoCD Application
+  syncPolicy:
+    automated:
+      selfHeal: true      # Automatically sync when cluster state drifts from Git
+      prune: false        # Do not delete resources removed from Git (safer for production)
+    syncOptions:
+      - CreateNamespace=true  # Create the namespace if it doesn't exist

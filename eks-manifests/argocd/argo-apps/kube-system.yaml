@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kube-system
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/${GITHUB_USERNAME}/project1_infrastructure.git
+    targetRevision: main
+    path: eks-manifests/kube-system
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kube-system
+  syncPolicy:
+    automated:
+      selfHeal: true
+      prune: false
+    syncOptions:
+      - CreateNamespace=true

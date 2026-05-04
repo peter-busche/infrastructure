@@ -1,0 +1,25 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Pull the upstream ArgoCD install manifest (pinned to v3.0.6)
+resources:
+  - https://raw.githubusercontent.com/argoproj/argo-cd/v3.0.6/manifests/install.yaml
+  - namespace/ns-argocd.yaml
+  - redis-secret.yaml
+
+# Set namespace for all resources
+namespace: argocd
+
+# Patch the ArgoCD ConfigMap with our settings
+patches:
+  - path: argocd-cm.yaml
+
+# Replace upstream images with our ECR mirrors
+# This is how the company repo handles it in overlays/live/kustomization.yaml
+images:
+  - name: quay.io/argoproj/argocd
+    newName: ${AWS_ACCOUNT_ID}.dkr.ecr.us-west-2.amazonaws.com/mirror
+    newTag: argocd-v3-0-6
+  - name: redis
+    newName: ${AWS_ACCOUNT_ID}.dkr.ecr.us-west-2.amazonaws.com/mirror
+    newTag: redis-7-2-7-alpine

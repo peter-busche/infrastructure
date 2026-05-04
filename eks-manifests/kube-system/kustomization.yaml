@@ -1,0 +1,9 @@
+# Kustomization for kube-system addons.
+# This includes system-level components: storage class and metrics server.
+# Apply this directory to set up cluster fundamentals.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - storageclass-gp3.yaml
+  - metrics-server.yaml

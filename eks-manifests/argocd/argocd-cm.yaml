@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-cm
+data:
+  # Run ArgoCD server without TLS — TLS is handled at the port-forward or ingress layer
+  server.insecure: 'true'
+  # Enable the built-in admin account (password retrieved via argocd CLI or kubectl secret)
+  admin.enabled: 'true'
+  # Allow Kustomize to render Helm charts and reference resources outside the app directory
+  kustomize.buildOptions: --enable-helm --load-restrictor LoadRestrictionsNone

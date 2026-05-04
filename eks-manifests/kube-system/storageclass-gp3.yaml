@@ -1,0 +1,23 @@
+# Define a Kubernetes StorageClass for AWS EBS GP3 volumes.
+# StorageClasses are templates for provisioning PersistentVolumes when pods request storage.
+#
+# Configuration breakdown:
+# - provisioner: ebs.csi.aws.com — Use the EBS CSI driver (enabled in Terraform)
+# - type: gp3 — Use GP3 volumes (general purpose, good price/performance balance)
+# - is-default-class: "true" — Make this the default storage when PVCs don't specify a class
+# - WaitForFirstConsumer — Delay volume creation until a pod actually uses it (cost-saving)
+# - allowVolumeExpansion: true — Allow pods to request larger volumes later
+# - reclaimPolicy: Delete — Automatically delete the EBS volume when the PVC is deleted
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: gp3
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "true"
+provisioner: ebs.csi.aws.com
+parameters:
+  type: gp3
+  fsType: ext4
+volumeBindingMode: WaitForFirstConsumer
+allowVolumeExpansion: true
+reclaimPolicy: Delete
