@@ -10,3 +10,5 @@ scripts/list_variables.sh
 eks-manifests/argocd/redis-secret.yaml
 eks-manifests/argocd/repos/repo-secret.yaml
 eks-manifests/argocd/repos/rag-api-repo-secret.yaml
+
+.DS_Store

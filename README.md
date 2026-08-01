@@ -38,3 +38,21 @@ This repo automates the daily creation and destruction of an EKS cluster in AWS,
 
 The bootstrap layer (S3 state bucket + DynamoDB lock table) is persistent and only created once.
 
+
+## Screenshots
+
+**ArgoCD auto-syncs the `rag-api` app after a CI/CD image update:**
+
+![ArgoCD application tree — rag-api healthy and synced](docs/screenshots/argocd-rag-api-tree.png)
+
+**Automated PR bumping the deployed image tag, merged by the rag-api pipeline:**
+
+![GitHub PR automatically updating the rag-api image tag](docs/screenshots/github-pr-automated-image-update.png)
+
+**Resource tree drilled into the running pod:**
+
+![ArgoCD pod-level detail for rag-api](docs/screenshots/argocd-rag-api-pod-detail.png)
+
+**App re-synced and healthy after the latest deploy:**
+
+![ArgoCD rag-api synced to the latest revision](docs/screenshots/argocd-rag-api-synced-latest.png)
