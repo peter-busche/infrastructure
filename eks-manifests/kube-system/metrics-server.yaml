@@ -1,11 +1,3 @@
-# Deploy Kubernetes Metrics Server.
-# Metrics Server collects resource metrics (CPU, memory) from kubelets across the cluster.
-# This enables `kubectl top` commands and horizontal pod autoscaling (HPA).
-# The manifests below include: ServiceAccount, ClusterRoles, ClusterRoleBindings,
-# Service, Deployment, and APIService registration.
-
-# ServiceAccount for metrics-server pod.
-# This allows the pod to authenticate with the Kubernetes API.
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -14,9 +6,7 @@ metadata:
   labels:
     app.kubernetes.io/name: metrics-server
 ---
-# Aggregated ClusterRole for metrics readers.
-# The labels with "aggregate-to-*" mean these permissions are automatically
-# added to admin, edit, and view roles, so users with those roles can read metrics.
+
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -31,8 +21,7 @@ rules:
     resources: ["pods", "nodes"]
     verbs: ["get", "list", "watch"]
 ---
-# ClusterRole for metrics-server itself.
-# Grants permissions to fetch metrics from kubelets and list pods/nodes.
+
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -47,8 +36,7 @@ rules:
     resources: ["pods", "nodes"]
     verbs: ["get", "list", "watch"]
 ---
-# Bind the auth-delegator role to metrics-server.
-# This allows metrics-server to delegate authentication checks to the API server.
+
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
@@ -64,8 +52,7 @@ subjects:
     name: metrics-server
     namespace: kube-system
 ---
-# Bind the metrics-server ClusterRole to the metrics-server ServiceAccount.
-# This grants the pod permissions to read pod and node metrics.
+
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
@@ -81,8 +68,7 @@ subjects:
     name: metrics-server
     namespace: kube-system
 ---
-# RoleBinding (namespace-scoped) to allow metrics-server to read authentication config.
-# This lets metrics-server validate requests from kubelets in the kube-system namespace.
+
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
@@ -99,8 +85,7 @@ subjects:
     name: metrics-server
     namespace: kube-system
 ---
-# Kubernetes Service to expose the metrics-server pod within the cluster.
-# The API server will call this service to fetch metrics from kubelets.
+
 apiVersion: v1
 kind: Service
 metadata:
@@ -117,16 +102,7 @@ spec:
   selector:
     app.kubernetes.io/name: metrics-server
 ---
-# Deployment for the metrics-server pod.
-# This runs the metrics-server container, which collects metrics from kubelets.
-# Configuration includes:
-# - replicas: 1 — Single pod (sufficient for dev cluster)
-# - maxUnavailable: 0 — Ensure the pod is always available (no downtime during updates)
-# - image: metrics-server v0.7.2 — Stable release
-# - metric-resolution: 15s — Collect metrics every 15 seconds (default 60s)
-# - CPU/memory requests are minimal (100m CPU, 200Mi memory)
-# - Security context runs as non-root with read-only filesystem (defense-in-depth)
-# - priorityClassName: system-cluster-critical — Ensures this pod is not evicted
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -196,9 +172,7 @@ spec:
           emptyDir: {}
       priorityClassName: system-cluster-critical
 ---
-# Register metrics-server as a custom Kubernetes API extension.
-# This tells the API server that the metrics.k8s.io group (used by kubectl top)
-# is served by the metrics-server service in kube-system namespace.
+
 apiVersion: apiregistration.k8s.io/v1
 kind: APIService
 metadata:

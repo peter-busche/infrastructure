@@ -1,8 +1,3 @@
-# Grant IAM principals access to the EKS cluster using access entries
-# This is the modern approach (replaces aws-auth ConfigMap for EKS v1.24+)
-# Access entries are created automatically when the cluster is created
-
-# Grant root user cluster admin access
 resource "aws_eks_access_entry" "root" {
   cluster_name      = module.eks.cluster_name
   principal_arn     = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
@@ -20,8 +15,7 @@ resource "aws_eks_access_policy_association" "root_admin" {
   }
 }
 
-# Grant peter-cli user cluster admin access
-# The ARN is sourced from environment variable to avoid hardcoding
+
 resource "aws_eks_access_entry" "admin_user" {
   cluster_name      = module.eks.cluster_name
   principal_arn     = var.admin_user_arn
@@ -39,5 +33,4 @@ resource "aws_eks_access_policy_association" "admin_user_policy" {
   }
 }
 
-# Data source to get current AWS account ID
 data "aws_caller_identity" "current" {}

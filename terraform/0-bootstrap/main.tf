@@ -1,6 +1,4 @@
-# -----------------------------------------------------------------------------
-# S3 Bucket for Terraform State
-# -----------------------------------------------------------------------------
+
 resource "aws_s3_bucket" "tfstate" {
   bucket = "peter-project1-tfstate"
 
@@ -41,9 +39,7 @@ resource "aws_s3_bucket_public_access_block" "tfstate" {
   restrict_public_buckets = true
 }
 
-# -----------------------------------------------------------------------------
-# DynamoDB Table for State Locking
-# -----------------------------------------------------------------------------
+
 resource "aws_dynamodb_table" "tflocks" {
   name         = "peter-project1-tflocks"
   billing_mode = "PAY_PER_REQUEST"

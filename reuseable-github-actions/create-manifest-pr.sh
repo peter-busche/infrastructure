@@ -1,10 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Create a PR in project1_infrastructure with updated rag-api image tag
-# Expects to be called from a GitHub Actions workflow with the infrastructure repo already checked out
-
-# Validate required environment variables
 if [ -z "${IMAGE_TAG:-}" ]; then
   echo "Error: IMAGE_TAG environment variable not set"
   exit 1
@@ -26,16 +22,13 @@ echo "=== Creating manifest update PR ==="
 echo "Image tag: $IMAGE_TAG"
 echo ""
 
-# Change to infrastructure repo directory
 cd infrastructure
 
-# Configure git
 echo "[1/4] Configuring git..."
 git config user.name "github-actions[bot]"
 git config user.email "github-actions[bot]@users.noreply.github.com"
 echo "✓ Git configured"
 
-# Verify kustomization.yaml exists
 echo ""
 echo "[2/4] Updating kustomization.yaml..."
 if [ ! -f "$KUSTOM_FILE" ]; then
@@ -43,20 +36,17 @@ if [ ! -f "$KUSTOM_FILE" ]; then
   exit 1
 fi
 
-# Verify AWS_ACCOUNT_ID is provided
 if [ -z "${AWS_ACCOUNT_ID:-}" ]; then
   echo "Error: AWS_ACCOUNT_ID environment variable not set"
   exit 1
 fi
 
-# Update both the AWS account ID and image tag in a single pass
 echo "Updating kustomization.yaml..."
 sed -e "s|\${AWS_ACCOUNT_ID}|$AWS_ACCOUNT_ID|g" \
     -e "s|newTag: .*|newTag: $IMAGE_TAG|" \
     "$KUSTOM_FILE" > "${KUSTOM_FILE}.tmp"
 mv "${KUSTOM_FILE}.tmp" "$KUSTOM_FILE"
 
-# Verify the update
 echo "Updated manifest:"
 grep -E "newName:|newTag:" "$KUSTOM_FILE"
 if ! grep "newName: $AWS_ACCOUNT_ID.dkr.ecr" "$KUSTOM_FILE" >/dev/null; then
@@ -65,23 +55,19 @@ if ! grep "newName: $AWS_ACCOUNT_ID.dkr.ecr" "$KUSTOM_FILE" >/dev/null; then
 fi
 echo "✓ Manifest updated"
 
-# Create branch, commit, push
 echo ""
 echo "[3/4] Creating branch and pushing changes..."
 BRANCH_NAME="update-rag-api-${IMAGE_TAG}"
 
-# Create and checkout branch
 git checkout -b "$BRANCH_NAME"
 
-# Stage and commit
 git add "$KUSTOM_FILE"
 git commit -m "chore: update rag-api image tag to $IMAGE_TAG"
 
-# Push with authentication
+
 git push origin "$BRANCH_NAME"
 echo "✓ Changes pushed to $BRANCH_NAME"
 
-# Create PR using gh CLI
 echo ""
 echo "[4/4] Creating pull request..."
 PR_BODY="Automated manifest update from rag_api build.

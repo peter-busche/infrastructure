@@ -1,10 +1,6 @@
 terraform {
   required_version = "~> 1.9.0"
 
-  # STEP 1: First apply with local backend (leave this commented out).
-  # STEP 2: After `terraform apply` succeeds, uncomment the block below
-  #         and run `terraform init -migrate-state` to move state to S3.
-  #
   backend "s3" {
     bucket         = "peter-project1-tfstate"
     key            = "bootstrap/terraform.tfstate"
